@@ -5,5 +5,4 @@ node_modules/
 /native/Debug/
 /native/Release/
 /native/packages/
-/native/3rd/
 InfLink.dll.pdb
