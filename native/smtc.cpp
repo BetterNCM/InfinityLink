@@ -42,8 +42,6 @@ char* enableSMTC(void** args) {
 
 	SystemMediaTransportControls smtc = mediaPlayer->SystemMediaTransportControls();
 
-	smtc.PlaybackStatus(MediaPlaybackStatus::Playing);
-
 	auto updater = smtc.DisplayUpdater();
 	updater.ClearAll();
 	updater.Type(MediaPlaybackType::Music);
@@ -81,7 +79,6 @@ char* updateSMTC(void** args) {
 		smtc.IsEnabled(true);
 		smtc.IsPlayEnabled(true);
 		smtc.IsPauseEnabled(true);
-		smtc.PlaybackStatus(MediaPlaybackStatus::Playing);
 
 		auto updater = smtc.DisplayUpdater();
 		updater.ClearAll();
