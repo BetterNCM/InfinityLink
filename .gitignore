@@ -6,3 +6,4 @@ node_modules/
 /native/Release/
 /native/packages/
 InfLink.dll.pdb
+.vs/

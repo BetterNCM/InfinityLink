@@ -51,7 +51,6 @@ char* enableSMTC(void** args) {
 
 	properties.Title(to_hstring(std::string("Loading")));
 
-
 	updater.Update();
 
 	return nullptr;
