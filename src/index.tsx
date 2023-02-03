@@ -15,13 +15,14 @@ import {
 } from "react-icons/md";
 import { useLocalStorage } from "./hooks";
 import "./index.scss";
-import { Alert, Card, Switch, Typography } from "@mui/material";
+import { Alert, Card, Divider, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup, Switch, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { render } from "react-dom";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import { STORE_KEY_INFO_PROVIDER, STORE_KEY_SMTC_ENABLED } from "./keys";
 import { DOMProvider } from "./SongInfoProviders/DOMProvider";
 import { BaseProvider } from "./SongInfoProviders/BaseProvider";
+import { NativeProvider } from "./SongInfoProviders/NativeProvider";
 
 let configElement = document.createElement("div");
 
@@ -73,10 +74,18 @@ function Main() {
     );
 
     React.useEffect(() => {
-        if (InfoProvider) InfoProvider.disabled = true;
+        if (InfoProvider) {
+            InfoProvider.disabled = true;
+            InfoProvider.dispatchEvent(new CustomEvent("disable"));
+        }
 
         if (infoProviderName === "dom") setInfoProvider(new DOMProvider());
+        if (infoProviderName === "native") setInfoProvider(new NativeProvider());
     }, [infoProviderName]);
+
+    React.useEffect(()=>{
+        InfoProvider?.dispatchEvent(new CustomEvent("enable"));
+    },[InfoProvider]);
 
     React.useEffect(() => {
         function onUpdateSongInfo(e) {
@@ -143,11 +152,23 @@ function Main() {
 
     return (
         <div>
-            <Switch
-                checked={SMTCEnabled}
-                onChange={(e, checked) => setSMTCEnabled(checked)}
-            />
-            <span>开启SMTC</span>
+            <FormGroup>
+                <FormLabel>信息源</FormLabel>
+                <RadioGroup
+                    row
+                    defaultValue={infoProviderName}
+                    onChange={(_, v) => setInfoProviderName(v)}
+                    name="infoprovider"
+                >
+                    <FormControlLabel value="dom" control={<Radio />} label="DOM" />
+                    <FormControlLabel value="native" control={<Radio />} label="原生" />
+                </RadioGroup>
+
+                <FormControlLabel control={<Switch
+                    checked={SMTCEnabled}
+                    onChange={(e, checked) => setSMTCEnabled(checked)}
+                />} label="开启 SMTC" />
+            </FormGroup>
         </div>
     );
 }
