@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+
+#include <ppltasks.h>
 #include <include/capi/cef_task_capi.h>
 #include <include/capi/cef_v8_capi.h>
 #include "winrt/Windows.Media.Control.h"
@@ -14,26 +16,30 @@ using namespace winrt::Windows::Foundation;
 
 using namespace winrt::Windows::Media::Playback;
 using namespace winrt::Windows::Media;
-using namespace winrt::Windows::Media::Control;
+using namespace Control;
 
 using namespace winrt;
-using namespace winrt::Windows::Media::Control;
-using namespace winrt::Windows::ApplicationModel::Core;
+using namespace Control;
+using namespace Windows::ApplicationModel::Core;
 
 using namespace Windows::Storage::Streams;
 BetterNCMNativePlugin::extensions::JSFunction* callback = nullptr;
-std::optional<winrt::Windows::Media::Playback::MediaPlayer> mediaPlayer;
+std::optional<MediaPlayer> mediaPlayer;
 
-char* enableSMTC(void** args) {
-	if (!mediaPlayer.has_value()) {
+char* enableSMTC(void** args)
+{
+	if (!mediaPlayer.has_value())
+	{
 		mediaPlayer = MediaPlayer();
 
 
 		mediaPlayer->SystemMediaTransportControls().ButtonPressed([&](SystemMediaTransportControls sender,
-			SystemMediaTransportControlsButtonPressedEventArgs args) {
-				auto btn = static_cast<int32_t>(args.Button());
-		if (callback)(*callback)(btn);
-			});
+		                                                              SystemMediaTransportControlsButtonPressedEventArgs
+		                                                              args)
+		{
+			auto btn = static_cast<int32_t>(args.Button());
+			if (callback)(*callback)(btn);
+		});
 	}
 
 
@@ -54,7 +60,8 @@ char* enableSMTC(void** args) {
 	return nullptr;
 }
 
-char* disableSMTC(void** args) {
+char* disableSMTC(void** args)
+{
 	if (!mediaPlayer.has_value())
 		mediaPlayer = MediaPlayer();
 
@@ -65,55 +72,72 @@ char* disableSMTC(void** args) {
 	return nullptr;
 }
 
-char* updateSMTC(void** args) {
+char* updateSMTC(void** args)
+{
 	if (!mediaPlayer.has_value())
 		mediaPlayer = MediaPlayer();
 
-	try {
-
-		const auto commandManager = mediaPlayer->CommandManager();
-		commandManager.IsEnabled(false);
-
-		SystemMediaTransportControls smtc = mediaPlayer->SystemMediaTransportControls();
-
-		smtc.IsEnabled(true);
-		smtc.IsPlayEnabled(true);
-		smtc.IsPauseEnabled(true);
-
-		auto updater = smtc.DisplayUpdater();
-		updater.ClearAll();
-		updater.Type(MediaPlaybackType::Music);
-
-		auto imgurl = std::string((char*)args[3]);
+	try
+	{
+		auto imgurl = std::string(static_cast<char*>(args[3]));
 		if (imgurl.length() > 0)
-			updater.Thumbnail(RandomAccessStreamReference::CreateFromUri(
-				Uri(to_hstring(imgurl))));
+		{
+			// replace / to \\
 
-		auto properties = updater.MusicProperties();
+			std::replace(imgurl.begin(), imgurl.end(), '/', '\\');
 
-		properties.Title(to_hstring(std::string((char*)args[0])));
-		properties.AlbumTitle(to_hstring(std::string((char*)args[1])));
 
-		properties.Artist(to_hstring(std::string((char*)args[2])));
 
-		updater.Update();
+			auto file = Windows::Storage::StorageFile::GetFileFromPathAsync(to_hstring(imgurl)).get();
+			
+
+			// update thumbnail with file
+			auto stream = file.OpenAsync(Windows::Storage::FileAccessMode::Read).get();
+			// stream to RandomAccessStream
+			auto raStream = RandomAccessStreamReference::CreateFromStream(stream);
+
+			const auto commandManager = mediaPlayer->CommandManager();
+			commandManager.IsEnabled(false);
+
+			SystemMediaTransportControls smtc = mediaPlayer->SystemMediaTransportControls();
+
+			smtc.IsEnabled(true);
+			smtc.IsPlayEnabled(true);
+			smtc.IsPauseEnabled(true);
+
+			auto updater = smtc.DisplayUpdater();
+			updater.ClearAll();
+			updater.Type(MediaPlaybackType::Music);
+			updater.Thumbnail(raStream);
+
+			auto properties = updater.MusicProperties();
+			properties.Title(to_hstring(std::string(static_cast<char*>(args[0]))));
+			properties.AlbumTitle(to_hstring(std::string(static_cast<char*>(args[1]))));
+			properties.Artist(to_hstring(std::string(static_cast<char*>(args[2]))));
+			updater.Update();
+			
+		}
 	}
-	catch (std::exception& e) {
+	catch (std::exception& e)
+	{
 		return Utils::to_cstr_dyn(e.what());
 	}
 
 	return nullptr;
 }
 
-char* updateSMTCPlayState(void** args) {
-	try {
+char* updateSMTCPlayState(void** args)
+{
+	try
+	{
 		int state = **(int**)args;
 
 		SystemMediaTransportControls smtc = mediaPlayer->SystemMediaTransportControls();
 
 		smtc.PlaybackStatus(static_cast<MediaPlaybackStatus>(state));
 	}
-	catch (std::exception& e) {
+	catch (std::exception& e)
+	{
 		return Utils::to_cstr_dyn(e.what());
 	}
 
@@ -122,7 +146,7 @@ char* updateSMTCPlayState(void** args) {
 
 char* registerSMTCEventCallback(void** args)
 {
-	cef_v8value_t* val = ((cef_v8value_t*)(args[0]));
+	auto val = static_cast<cef_v8value_t*>(args[0]);
 	callback = new BetterNCMNativePlugin::extensions::JSFunction(val);
 	SystemMediaTransportControls smtc = mediaPlayer->SystemMediaTransportControls();
 	smtc.IsEnabled(true);

@@ -20,21 +20,21 @@ char* updateSMTCPlayState(void** args);
 
 int BetterNCMPluginMain(BetterNCMNativePlugin::PluginAPI* api)
 {
-	api->addNativeAPI(new BetterNCMNativePlugin::NativeAPIType[0]{  }, 0, "inflink.test", testApi);
-	api->addNativeAPI(new BetterNCMNativePlugin::NativeAPIType[0]{  }, 0, "inflink.enableSMTC", enableSMTC);
-	api->addNativeAPI(new BetterNCMNativePlugin::NativeAPIType[0]{  }, 0, "inflink.disableSMTC", disableSMTC);
-	api->addNativeAPI(new BetterNCMNativePlugin::NativeAPIType[4]{
-		BetterNCMNativePlugin::NativeAPIType::String,
-		BetterNCMNativePlugin::NativeAPIType::String,
-		BetterNCMNativePlugin::NativeAPIType::String,
-		BetterNCMNativePlugin::NativeAPIType::String },
+	api->addNativeAPI(new NativeAPIType[0]{  }, 0, "inflink.test", testApi);
+	api->addNativeAPI(new NativeAPIType[0]{  }, 0, "inflink.enableSMTC", enableSMTC);
+	api->addNativeAPI(new NativeAPIType[0]{  }, 0, "inflink.disableSMTC", disableSMTC);
+	api->addNativeAPI(new NativeAPIType[4]{
+		NativeAPIType::String,
+		NativeAPIType::String,
+		NativeAPIType::String,
+		NativeAPIType::String },
 		4, "inflink.updateSMTC", updateSMTC);
 
-	api->addNativeAPI(new BetterNCMNativePlugin::NativeAPIType[1]{
-	BetterNCMNativePlugin::NativeAPIType::V8Value },
+	api->addNativeAPI(new NativeAPIType[1]{
+	NativeAPIType::V8Value },
 	1, "inflink.registerSMTCEventCallback", registerSMTCEventCallback);
 
-	api->addNativeAPI(new BetterNCMNativePlugin::NativeAPIType[1]{ BetterNCMNativePlugin::NativeAPIType::Int },
+	api->addNativeAPI(new NativeAPIType[1]{ NativeAPIType::Int },
 		1, "inflink.updateSMTCPlayState", updateSMTCPlayState);
 	return 0;
 }

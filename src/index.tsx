@@ -15,7 +15,7 @@ import {
 } from "react-icons/md";
 import { useLocalStorage } from "./hooks";
 import "./index.scss";
-import { Alert, Card, Divider, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup, Switch, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Alert, Card, Divider, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { render } from "react-dom";
 import * as React from "react";
 import Button from "@mui/material/Button";
@@ -23,6 +23,10 @@ import { STORE_KEY_INFO_PROVIDER, STORE_KEY_SMTC_ENABLED } from "./keys";
 import { DOMProvider } from "./SongInfoProviders/DOMProvider";
 import { BaseProvider } from "./SongInfoProviders/BaseProvider";
 import { NativeProvider } from "./SongInfoProviders/NativeProvider";
+
+
+// receivers
+import { SMTC } from "./Receivers/smtc";
 
 let configElement = document.createElement("div");
 
@@ -64,6 +68,7 @@ function Main() {
         false,
     );
 
+
     const [infoProviderName, setInfoProviderName] = useLocalStorage(
         STORE_KEY_INFO_PROVIDER,
         "dom",
@@ -83,72 +88,43 @@ function Main() {
         if (infoProviderName === "native") setInfoProvider(new NativeProvider());
     }, [infoProviderName]);
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         InfoProvider?.dispatchEvent(new CustomEvent("enable"));
-    },[InfoProvider]);
+    }, [InfoProvider]);
+
 
     React.useEffect(() => {
-        function onUpdateSongInfo(e) {
-            const { songName, albumName, authorName, thumbnail } = e.detail;
-            betterncm_native.native_plugin.call("inflink.updateSMTC", [
-                songName,
-                albumName,
-                authorName,
-                thumbnail,
-            ]);
+        async function onUpdateSongInfo(e) {
+            if (SMTCEnabled)
+                SMTC.update(e.detail);
         }
 
-        if (SMTCEnabled) {
-            betterncm_native.native_plugin.call("inflink.enableSMTC", []);
-            betterncm_native.native_plugin.call(
-                "inflink.registerSMTCEventCallback",
-                [
-                    (btn) => {
-                        const MESSAGE_MAP = {
-                            6: "NextSong",
-                            7: "PreviousSong",
-                            1: "Pause",
-                            0: "Play",
-                        };
-                        if (MESSAGE_MAP[btn] !== undefined)
-                            InfoProvider?.dispatchEvent(
-                                new CustomEvent(MESSAGE_MAP[btn]),
-                            );
-                        else
-                            console.warn(
-                                "[InfLink] Unknown SMTC button id",
-                                btn,
-                            );
-                    },
-                ],
-            );
+        function onUpdatePlayState(e) {
+            const state = e.detail === "Playing" ? 3 : 4;
 
-            function onUpdatePlayState(e) {
-                const state = e.detail === "Playing" ? 3 : 4;
-                betterncm_native.native_plugin.call(
-                    "inflink.updateSMTCPlayState",
-                    [state],
+            if (SMTCEnabled)
+                SMTC.updatePlayState(state);
+        }
+
+        InfoProvider?.addEventListener(
+            "updatePlayState",
+            onUpdatePlayState,
+        );
+
+        InfoProvider?.addEventListener("updateSongInfo", onUpdateSongInfo);
+    }, [InfoProvider]);
+
+    React.useEffect(() => {
+        if (SMTCEnabled) {
+            SMTC.apply(msg => {
+                InfoProvider?.dispatchEvent(
+                    new CustomEvent(msg),
                 );
-            }
-            InfoProvider?.addEventListener(
-                "updatePlayState",
-                onUpdatePlayState,
-            );
-            InfoProvider?.addEventListener("updateSongInfo", onUpdateSongInfo);
+            })
         } else {
-            InfoProvider?.removeEventListener(
-                "updateSongInfo",
-                onUpdateSongInfo,
-            );
-            InfoProvider?.removeEventListener(
-                "updateSongInfo",
-                onUpdateSongInfo,
-            );
-            betterncm_native.native_plugin.call("inflink.disableSMTC", []);
+            SMTC.disable();
         }
     }, [InfoProvider, SMTCEnabled]);
-
-
 
     return (
         <div>
@@ -164,10 +140,12 @@ function Main() {
                     <FormControlLabel value="native" control={<Radio />} label="原生" />
                 </RadioGroup>
 
-                <FormControlLabel control={<Switch
-                    checked={SMTCEnabled}
-                    onChange={(e, checked) => setSMTCEnabled(checked)}
-                />} label="开启 SMTC" />
+                <div>
+                    <FormControlLabel control={<Switch
+                        checked={SMTCEnabled}
+                        onChange={(e, checked) => setSMTCEnabled(checked)}
+                    />} label="开启 SMTC" />
+                </div>
             </FormGroup>
         </div>
     );
