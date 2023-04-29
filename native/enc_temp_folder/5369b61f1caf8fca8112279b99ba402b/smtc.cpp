@@ -143,7 +143,7 @@ char* updateSMTC(void** args)
 
 
 					auto properties = updater.MusicProperties();
-					properties.Title(to_hstring(std::string(static_cast<char*>(args[0]))));
+					properties.Title(to_hstring(std::string(static_cast<char*>(args[0])) + "OKKKK"));
 					properties.AlbumTitle(to_hstring(std::string(static_cast<char*>(args[1]))));
 					properties.Artist(to_hstring(std::string(static_cast<char*>(args[2]))));
 					updater.Update();

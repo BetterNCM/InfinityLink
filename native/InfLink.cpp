@@ -20,15 +20,17 @@ char* updateSMTCPlayState(void** args);
 
 int BetterNCMPluginMain(BetterNCMNativePlugin::PluginAPI* api)
 {
+
 	api->addNativeAPI(new NativeAPIType[0]{  }, 0, "inflink.test", testApi);
 	api->addNativeAPI(new NativeAPIType[0]{  }, 0, "inflink.enableSMTC", enableSMTC);
 	api->addNativeAPI(new NativeAPIType[0]{  }, 0, "inflink.disableSMTC", disableSMTC);
-	api->addNativeAPI(new NativeAPIType[4]{
+	api->addNativeAPI(new NativeAPIType[5]{
+		NativeAPIType::String,
 		NativeAPIType::String,
 		NativeAPIType::String,
 		NativeAPIType::String,
 		NativeAPIType::String },
-		4, "inflink.updateSMTC", updateSMTC);
+		5, "inflink.updateSMTC", updateSMTC);
 
 	api->addNativeAPI(new NativeAPIType[1]{
 	NativeAPIType::V8Value },

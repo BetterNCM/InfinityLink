@@ -5,4 +5,9 @@
     <LocalDebuggerWorkingDirectory>C:\Program Files (x86)\NetEase\CloudMusic\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommand>C:\Program Files (x86)\NetEase\CloudMusic\cloudmusic.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>C:\Program Files (x86)\NetEase\CloudMusic\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

@@ -29,7 +29,7 @@ export const SMTC = {
         await betterncm.fs.mkdir('./InfLink-Thumbnail-Cache/')
         for (const file of await betterncm.fs.readDir('./InfLink-Thumbnail-Cache/')) {
             const time = parseInt(file.split('-')[1].split('.')[0]);
-            if (Date.now() - time > 1000 * 60 * 60 * 24 * 7) {
+            if (Date.now() - time > 1000 * 60 * 60) {
                 await betterncm.fs.remove(`./InfLink-Thumbnail-Cache/${file}`);
             }
         }
@@ -43,6 +43,7 @@ export const SMTC = {
             albumName,
             authorName,
             `${await betterncm.app.getDataPath()}${filePath}`,
+            thumbnail
         ]);
     },
     updatePlayState(state) {
