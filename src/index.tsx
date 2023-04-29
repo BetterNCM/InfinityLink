@@ -19,7 +19,7 @@ import { Alert, Card, Divider, FormControlLabel, FormGroup, FormLabel, Radio, Ra
 import { render } from "react-dom";
 import * as React from "react";
 import Button from "@mui/material/Button";
-import { STORE_KEY_INFO_PROVIDER, STORE_KEY_SMTC_ENABLED } from "./keys";
+import { STORE_KEY_DCRPC_ENABLED, STORE_KEY_INFO_PROVIDER, STORE_KEY_SMTC_ENABLED } from "./keys";
 import { DOMProvider } from "./SongInfoProviders/DOMProvider";
 import { BaseProvider } from "./SongInfoProviders/BaseProvider";
 import { NativeProvider } from "./SongInfoProviders/NativeProvider";
@@ -27,6 +27,7 @@ import { NativeProvider } from "./SongInfoProviders/NativeProvider";
 
 // receivers
 import { SMTC } from "./Receivers/smtc";
+import { DCRPC } from "./Receivers/dc-rpc";
 
 let configElement = document.createElement("div");
 
@@ -65,8 +66,13 @@ function Main() {
 
     const [SMTCEnabled, setSMTCEnabled] = useLocalStorage(
         STORE_KEY_SMTC_ENABLED,
-        false,
+        true,
     );
+
+    const [DCRPCEnabled, setDCRPCEnabled] = useLocalStorage(
+        STORE_KEY_DCRPC_ENABLED,
+        true,
+    )
 
 
     const [infoProviderName, setInfoProviderName] = useLocalStorage(
@@ -97,6 +103,9 @@ function Main() {
         async function onUpdateSongInfo(e) {
             if (SMTCEnabled)
                 SMTC.update(e.detail);
+
+            if (DCRPCEnabled)
+                DCRPC.update(e.detail);
         }
 
         function onUpdatePlayState(e) {
@@ -126,6 +135,12 @@ function Main() {
         }
     }, [InfoProvider, SMTCEnabled]);
 
+    React.useEffect(() => {
+        if (DCRPCEnabled) {
+            DCRPC.apply();
+        }
+    }, [DCRPCEnabled]);
+
     return (
         <div>
             <FormGroup>
@@ -145,6 +160,11 @@ function Main() {
                         checked={SMTCEnabled}
                         onChange={(e, checked) => setSMTCEnabled(checked)}
                     />} label="开启 SMTC" />
+
+                    <FormControlLabel control={<Switch
+                        checked={DCRPCEnabled}
+                        onChange={(e, checked) => setDCRPCEnabled(checked)}
+                    />} label="开启 Discord RPC" />
                 </div>
             </FormGroup>
         </div>
