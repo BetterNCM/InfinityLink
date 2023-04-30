@@ -27,12 +27,6 @@ using namespace Windows::Storage::Streams;
 BetterNCMNativePlugin::extensions::JSFunction* callback = nullptr;
 std::optional<MediaPlayer> mediaPlayer;
 
-bool cover_url_mode = false;
-
-char* set_cover_url_mode(bool enable)
-{
-	cover_url_mode = enable;
-}
 
 char* enableSMTC(void** args)
 {
