@@ -152,7 +152,7 @@ function Main() {
                     name="infoprovider"
                 >
                     <FormControlLabel value="dom" control={<Radio />} label="DOM" />
-                    <FormControlLabel value="native" control={<Radio />} label="原生" />
+                    <FormControlLabel value="native" control={<Radio />} label="原生 (3.0.0 不可用)" />
                 </RadioGroup>
 
                 <div>

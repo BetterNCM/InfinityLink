@@ -6,24 +6,24 @@ export class DOMProvider extends BaseProvider {
         let lastImgUrl;
 
         this.addEventListener("Pause", () => {
-            (document.querySelector(".btnp") as HTMLButtonElement)?.click();
+            (document.querySelector(".btnp, .cmd-icon-pause") as HTMLButtonElement)?.click();
         });
 
         this.addEventListener("Play", () => {
-            (document.querySelector(".btnp") as HTMLButtonElement)?.click();
+            (document.querySelector(".btnp, .cmd-icon-play") as HTMLButtonElement)?.click();
         });
 
         this.addEventListener("PreviousSong", () => {
-            (document.querySelector(".btnc-prv") as HTMLButtonElement)?.click();
+            (document.querySelector(".btnc-prv, .cmd-icon-pre") as HTMLButtonElement)?.click();
         });
 
         this.addEventListener("NextSong", () => {
-            (document.querySelector(".btnc-nxt") as HTMLButtonElement)?.click();
+            (document.querySelector(".btnc-nxt, .cmd-icon-next") as HTMLButtonElement)?.click();
         });
 
         let playState: PlayState;
         setInterval(() => {
-            const state = document.querySelector(".btnp-pause")
+            const state = document.querySelector(".btnp-pause, .cmd-icon-pause")
                 ? "Playing"
                 : "Paused";
             if (playState !== state) {
@@ -35,9 +35,9 @@ export class DOMProvider extends BaseProvider {
         }, 50);
 
         setInterval(() => {
-            if (document.querySelector(".j-cover")) {
+            if (document.querySelector(".j-cover, .cmd-image")) {
                 const imgUrl = (
-                    document?.querySelector(".j-cover") as HTMLImageElement
+                    document?.querySelector(".j-cover, .cmd-image") as HTMLImageElement
                 )?.src
                     .replace("orpheus://cache/?", "")
                     .replace(/\?(.*)/, "");
@@ -45,22 +45,23 @@ export class DOMProvider extends BaseProvider {
                 if (lastImgUrl === imgUrl) return;
                 lastImgUrl = imgUrl;
                 console.log("UPDATE");
+                const songName = (
+                    document.querySelector(
+                        ".j-title",
+                    ) as HTMLParagraphElement | null
+                )?.title ?? (
+                    document.querySelector(
+                        ".cmd-space.title > span",
+                    ) as HTMLParagraphElement | null
+                )?.innerText;
                 this.dispatchEvent(
                     new CustomEvent("updateSongInfo", {
                         detail: {
-                            songName: (
-                                document.querySelector(
-                                    ".j-title",
-                                ) as HTMLParagraphElement
-                            ).title,
-                            albumName: (
-                                document.querySelector(
-                                    ".j-title",
-                                ) as HTMLParagraphElement
-                            ).title,
+                            songName,
+                            albumName: songName,
                             authorName: (
                                 document.querySelector(
-                                    "p.j-title span.f-dib",
+                                    "p.j-title span.f-dib, .cmd-space.title .author",
                                 ) as HTMLParagraphElement
                             ).innerText,
                             thumbnail: imgUrl,
