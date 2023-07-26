@@ -74,6 +74,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>InfLink</TargetName>
+    <IncludePath>J:\Projects\BetterNCM\src\3rd\libcef;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>InfLink</TargetName>
@@ -138,11 +139,14 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>J:\Projects\BetterNCM\src\3rd\libcef\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <OutputFile>$(OutDir)/../../../$(TargetName)$(TargetExt).x64.dll</OutputFile>
+      <AdditionalDependencies>J:\Projects\BetterNCM\src\3rd\libcef\libcef_x64.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,6 +159,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>J:\Projects\BetterNCM\src\3rd\libcef\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,6 +167,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <OutputFile>$(OutDir)/../../../$(TargetName)$(TargetExt).x64.dll</OutputFile>
+      <AdditionalDependencies>J:\Projects\BetterNCM\src\3rd\libcef\libcef_x64.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -169,9 +176,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\BetterNCM\src\BetterNCMNativePlugin.h" />
     <ClInclude Include="InfLink.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="J:\Projects\BetterNCM\src\BetterNCMNativePlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
