@@ -1,4 +1,6 @@
+import { reactInstance } from "../utils";
 import { BaseProvider, PlayState } from "./BaseProvider";
+
 
 export class DOMProvider extends BaseProvider {
     constructor() {
@@ -35,12 +37,14 @@ export class DOMProvider extends BaseProvider {
         }, 50);
 
         setInterval(() => {
-            if (document.querySelector(".j-cover, .cmd-image")) {
-                const imgUrl = (
-                    document?.querySelector(".j-cover, .cmd-image") as HTMLImageElement
+            if (document.querySelector(".j-cover, [class^=\"DefaultBarWrapper_\"]")) {
+                let imgUrl = (
+                    document?.querySelector(".j-cover") as HTMLImageElement
                 )?.src
                     .replace("orpheus://cache/?", "")
                     .replace(/\?(.*)/, "");
+
+                imgUrl ??= reactInstance(document.querySelector('[class^="DefaultBarWrapper_"]')!).child.memoizedState.memoizedState[0][2].data.resource.album.cover
 
                 if (lastImgUrl === imgUrl) return;
                 lastImgUrl = imgUrl;

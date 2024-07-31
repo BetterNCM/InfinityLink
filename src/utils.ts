@@ -33,3 +33,5 @@ export function createHookFn(
         origin: fn,
     };
 }
+
+export const reactInstance = (e: HTMLElement) => e[Object.keys(e).find(v => v.includes('__reactInternalInstance'))!]

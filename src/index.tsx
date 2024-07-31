@@ -71,7 +71,7 @@ function Main() {
 
     const [DCRPCEnabled, setDCRPCEnabled] = useLocalStorage(
         STORE_KEY_DCRPC_ENABLED,
-        true,
+        false,
     )
 
 
