@@ -19,15 +19,15 @@ export const DCRPC = {
 ClientID=1101918033640951941
 
 [State]
-State=${name}
-Details=${artist}
+State=${artist}
+Details=${name}
 StartTimestamp=${Date.now()}
 
 [Images]
-LargeImage=bncm
-LargeImageTooltip=
-SmallImage=${cover}
-SmallImageTooltip=${name}
+LargeImage=${cover}
+LargeImageTooltip=${name}
+SmallImage=bncm
+SmallImageTooltip=BetterNCM
 `
     },
     async update({ songName, authorName, thumbnail }) {
