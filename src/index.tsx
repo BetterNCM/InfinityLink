@@ -115,12 +115,19 @@ function Main() {
                 SMTC.updatePlayState(state);
         }
 
+        async function onUpdateTimeline(e) {
+            if (SMTCEnabled)
+                SMTC.updateTimeline(e.detail);
+        }
+
         InfoProvider?.addEventListener(
             "updatePlayState",
             onUpdatePlayState,
         );
 
         InfoProvider?.addEventListener("updateSongInfo", onUpdateSongInfo);
+
+        InfoProvider?.addEventListener("updateTimeline", onUpdateTimeline);
     }, [InfoProvider]);
 
     React.useEffect(() => {

@@ -46,6 +46,12 @@ export const SMTC = {
             thumbnail
         ]);
     },
+    async updateTimeline({ currentTime, totalTime }) {
+        betterncm_native.native_plugin.call("inflink.updateSMTCTimeline", [
+            currentTime,
+            totalTime
+        ]);
+    },
     updatePlayState(state) {
         betterncm_native.native_plugin.call(
             "inflink.updateSMTCPlayState",
