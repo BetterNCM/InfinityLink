@@ -119,7 +119,6 @@ char* updateSMTC(void** args)
 
 			GetRandomAccessStreamFromFile(imgurl, [=](IRandomAccessStream raStream)
 				{
-
 					const auto commandManager = mediaPlayer->CommandManager();
 					commandManager.IsEnabled(false);
 
@@ -128,23 +127,19 @@ char* updateSMTC(void** args)
 					smtc.IsEnabled(true);
 					smtc.IsPlayEnabled(true);
 					smtc.IsPauseEnabled(true);
-
 
 					auto updater = smtc.DisplayUpdater();
 					updater.ClearAll();
 					updater.Thumbnail(RandomAccessStreamReference::CreateFromStream(raStream));
 					updater.Type(MediaPlaybackType::Music);
 
-
 					auto properties = updater.MusicProperties();
 					properties.Title(to_hstring(std::string(static_cast<char*>(args[0]))));
 					properties.AlbumTitle(to_hstring(std::string(static_cast<char*>(args[1]))));
 					properties.Artist(to_hstring(std::string(static_cast<char*>(args[2]))));
 					updater.Update();
-				
 				},[=]()
 				{
-
 					const auto commandManager = mediaPlayer->CommandManager();
 					commandManager.IsEnabled(false);
 
@@ -154,12 +149,10 @@ char* updateSMTC(void** args)
 					smtc.IsPlayEnabled(true);
 					smtc.IsPauseEnabled(true);
 
-
 					auto updater = smtc.DisplayUpdater();
 					updater.ClearAll();
 					updater.Thumbnail(RandomAccessStreamReference::CreateFromUri(Uri(to_hstring(imgurl_online))));
 					updater.Type(MediaPlaybackType::Music);
-
 
 					auto properties = updater.MusicProperties();
 					properties.Title(to_hstring(std::string(static_cast<char*>(args[0]))));
@@ -171,6 +164,29 @@ char* updateSMTC(void** args)
 			
 			
 		}
+	}
+	catch (std::exception& e)
+	{
+		return Utils::to_cstr_dyn(e.what());
+	}
+
+	return nullptr;
+}
+
+char* updateSMTCTimeline(void** args)
+{
+	if (!mediaPlayer.has_value())
+		mediaPlayer = MediaPlayer();
+
+	SystemMediaTransportControls smtc = mediaPlayer->SystemMediaTransportControls();
+
+	try
+	{
+		SystemMediaTransportControlsTimelineProperties timelineProperties;
+		timelineProperties.StartTime(TimeSpan{ 0 });
+		timelineProperties.Position(TimeSpan{ static_cast<int64_t>(*static_cast<int*>(args[0])) * 10000 });
+		timelineProperties.EndTime(TimeSpan{ static_cast<int64_t>(*static_cast<int*>(args[1])) * 10000 });
+		smtc.UpdateTimelineProperties(timelineProperties);
 	}
 	catch (std::exception& e)
 	{
