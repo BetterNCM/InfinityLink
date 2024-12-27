@@ -8,4 +8,5 @@ node_modules/
 InfLink.dll.pdb
 .vs/
 *.log
-/native/x64
+Debug
+Release
