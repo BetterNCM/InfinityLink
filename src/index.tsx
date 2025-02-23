@@ -4,47 +4,35 @@
  * 一般情况下只需要从这个入口点进行开发即可满足绝大部分需求
  */
 import {
-    MdAdd,
-    MdDelete,
-    MdDesktopWindows,
-    MdError,
-    MdSelectAll,
-    MdSettings,
-    MdWallpaper,
-    MdWarning,
-} from "react-icons/md";
-import { useLocalStorage } from "./hooks";
-import "./index.scss";
-import {
     Alert,
-    Card,
-    Divider,
     FormControlLabel,
     FormGroup,
     FormLabel,
     Radio,
     RadioGroup,
     Switch,
-    TextField,
-    ToggleButton,
-    ToggleButtonGroup,
     Typography,
 } from "@mui/material";
-import { render } from "react-dom";
 import * as React from "react";
-import Button from "@mui/material/Button";
+import { render } from "react-dom";
+import { MdError } from "react-icons/md";
+
+import "./index.scss";
+
+import { useLocalStorage } from "./hooks";
 import {
     STORE_KEY_DCRPC_ENABLED,
     STORE_KEY_INFO_PROVIDER,
     STORE_KEY_SMTC_ENABLED,
+    STORE_KEY_SMTC_IMPL,
 } from "./keys";
-import { DOMProvider } from "./SongInfoProviders/DOMProvider";
 import { BaseProvider } from "./SongInfoProviders/BaseProvider";
+import { DOMProvider } from "./SongInfoProviders/DOMProvider";
 import { NativeProvider } from "./SongInfoProviders/NativeProvider";
 
 // receivers
-import { SMTC } from "./Receivers/smtc";
 import { DCRPC } from "./Receivers/dc-rpc";
+import { SMTC } from "./Receivers/smtc";
 import { SMTCFrontend } from "./Receivers/smtc-frontend";
 
 let configElement = document.createElement("div");
