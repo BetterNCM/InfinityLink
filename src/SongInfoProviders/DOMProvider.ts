@@ -76,7 +76,21 @@ export class DOMProvider extends BaseProvider {
         }, 100);
 
         const updateTimeline = () => {
-            if (document.querySelector(".j-cover, [class^=\"DefaultBarWrapper_\"]")) {
+            let currentTimeMillis = 0;
+            let totalTimeMillis = 0;
+
+            const timeToMillis = (timeText: string) => {
+                const [minutes, seconds] = timeText.split(':').map(Number);
+                return (minutes * 60 + seconds) * 1000;
+            };
+
+            const mainPlayerTimeNowEl = document.querySelector<HTMLTimeElement>("#main-player > time.now");
+            if (mainPlayerTimeNowEl) {
+                // ncm 2
+                const timeAllEl = document.querySelector<HTMLTimeElement>("#main-player > time.all")!;
+                currentTimeMillis = timeToMillis(mainPlayerTimeNowEl.innerText);
+                totalTimeMillis = timeToMillis(timeAllEl.innerText);
+            } else if (document.querySelector(".j-cover, [class^=\"DefaultBarWrapper_\"]")) {
                 let currentTime = (document.querySelector(".cmd-space.middle  > div:nth-child(2) > p:nth-child(1)") as HTMLParagraphElement | null)?.innerText || "00:00";
                 let totalTime = (document.querySelector(".cmd-space.middle  > div:nth-child(2) > p:nth-child(3)") as HTMLParagraphElement | null)?.innerText || "00:00";
 
@@ -86,24 +100,19 @@ export class DOMProvider extends BaseProvider {
                     [currentTime, totalTime] = timeText.split(' / ');
                 }
 
-                const timeToMillis = (timeText: string) => {
-                    const [minutes, seconds] = timeText.split(':').map(Number);
-                    return (minutes * 60 + seconds) * 1000;
-                };
-
-                const currentTimeMillis = timeToMillis(currentTime);
-                const totalTimeMillis = timeToMillis(totalTime);
-                console.debug(`[InfLink] Time: ${currentTimeMillis} / ${totalTimeMillis}`);
-
-                this.dispatchEvent(
-                    new CustomEvent("updateTimeline", {
-                        detail: {
-                            currentTime: currentTimeMillis,
-                            totalTime: totalTimeMillis,
-                        },
-                    }),
-                );
+                currentTimeMillis = timeToMillis(currentTime);
+                totalTimeMillis = timeToMillis(totalTime);
             }
+
+            console.debug(`[InfLink] Time: ${currentTimeMillis} / ${totalTimeMillis}`);
+            this.dispatchEvent(
+                new CustomEvent("updateTimeline", {
+                    detail: {
+                        currentTime: currentTimeMillis,
+                        totalTime: totalTimeMillis,
+                    },
+                }),
+            );
         };
 
         setInterval(updateTimeline, 5000);
