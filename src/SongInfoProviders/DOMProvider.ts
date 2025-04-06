@@ -75,36 +75,69 @@ export class DOMProvider extends BaseProvider {
             }
         }, 100);
 
+        function elemVisible(e: HTMLElement): boolean {
+            const style = window.getComputedStyle(e)
+            return style.display !== 'none' && style.visibility !== 'hidden'
+        }
+
         const updateTimeline = () => {
-            let currentTimeMillis = 0;
-            let totalTimeMillis = 0;
+            let currentTime: string | undefined;
+            let totalTime: string | undefined;
 
             const timeToMillis = (timeText: string) => {
-                const [minutes, seconds] = timeText.split(':').map(Number);
+                const [minutes, seconds] = timeText.split(":").map(Number);
                 return (minutes * 60 + seconds) * 1000;
             };
 
-            const mainPlayerTimeNowEl = document.querySelector<HTMLTimeElement>("#main-player > time.now");
-            if (mainPlayerTimeNowEl) {
-                // ncm 2
-                const timeAllEl = document.querySelector<HTMLTimeElement>("#main-player > time.all")!;
-                currentTimeMillis = timeToMillis(mainPlayerTimeNowEl.innerText);
-                totalTimeMillis = timeToMillis(timeAllEl.innerText);
-            } else if (document.querySelector(".j-cover, [class^=\"DefaultBarWrapper_\"]")) {
-                let currentTime = (document.querySelector(".cmd-space.middle  > div:nth-child(2) > p:nth-child(1)") as HTMLParagraphElement | null)?.innerText || "00:00";
-                let totalTime = (document.querySelector(".cmd-space.middle  > div:nth-child(2) > p:nth-child(3)") as HTMLParagraphElement | null)?.innerText || "00:00";
-
+            const ncm3CurrentTimeEl = document.querySelector<HTMLParagraphElement>(
+                ".cmd-space.middle  > div:nth-child(2) > p:nth-child(1)",
+            );
+            const ncm3CurrentTime = ncm3CurrentTimeEl?.innerText || "00:00";
+            const ncm3TotalTimeEl = document.querySelector<HTMLParagraphElement>(
+                ".cmd-space.middle  > div:nth-child(2) > p:nth-child(3)",
+            );
+            const ncm3TotalTime = ncm3TotalTimeEl?.innerText || "00:00";
+            if (ncm3CurrentTime !== "00:00" || ncm3TotalTime !== "00:00") {
+                currentTime = ncm3CurrentTime;
+                totalTime = ncm3TotalTime;
+            } else {
                 // 啥都没有可能在内页
-                if (currentTime === "00:00" && totalTime === "00:00") {
-                    const timeText = (document.querySelector(".cmd-space > span:nth-child(5)") as HTMLSpanElement | null)?.innerText || "00:00 / 00:00";
-                    [currentTime, totalTime] = timeText.split(' / ');
+                const timeText = document.querySelector<HTMLParagraphElement>(
+                    ".cmd-space > div:nth-child(2) > p:nth-child(1)",
+                )?.innerText;
+                if (timeText) {
+                    [currentTime, totalTime] = timeText.split(" / ");
                 }
-
-                currentTimeMillis = timeToMillis(currentTime);
-                totalTimeMillis = timeToMillis(totalTime);
             }
 
+            if (!currentTime || !totalTime) {
+                // ncm2
+                let currentPlayerElem: HTMLDivElement | undefined;
+                const playerElems =
+                    document.querySelectorAll<HTMLDivElement>(".m-player");
+                for (let i = 0; i < playerElems.length; i++) {
+                    const playerElem = playerElems[i];
+                    if (elemVisible(playerElem)) {
+                        currentPlayerElem = playerElem;
+                        break;
+                    }
+                }
+                if (!currentPlayerElem) {
+                    console.debug(`[InfLink] No player found`);
+                    return;
+                }
+
+                const mainPlayerTimeNowEl =
+                    currentPlayerElem.querySelector<HTMLTimeElement>("time.now")!;
+                const timeAllEl = document.querySelector<HTMLTimeElement>("time.all")!;
+                currentTime = mainPlayerTimeNowEl.innerText;
+                totalTime = timeAllEl.innerText;
+            }
+
+            const currentTimeMillis = timeToMillis(currentTime);
+            const totalTimeMillis = timeToMillis(totalTime);
             console.debug(`[InfLink] Time: ${currentTimeMillis} / ${totalTimeMillis}`);
+            if (currentTimeMillis === 0 || totalTimeMillis === 0) return;
             this.dispatchEvent(
                 new CustomEvent("updateTimeline", {
                     detail: {
@@ -115,7 +148,7 @@ export class DOMProvider extends BaseProvider {
             );
         };
 
-        setInterval(updateTimeline, 5000);
+        setInterval(updateTimeline, 2000);
 
         document.addEventListener('click', (event) => {
             // 监听主页的进度条、内页的进度条、歌词旁边的一键跳转
