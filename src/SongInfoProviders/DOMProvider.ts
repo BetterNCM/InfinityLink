@@ -138,7 +138,7 @@ export class DOMProvider extends BaseProvider {
             const currentTimeMillis = timeToMillis(currentTime);
             const totalTimeMillis = timeToMillis(totalTime);
             console.debug(`[InfLink] Time: ${currentTimeMillis} / ${totalTimeMillis}`);
-            if (currentTimeMillis === 0 || totalTimeMillis === 0) return;
+            if (currentTimeMillis === 0 && totalTimeMillis === 0) return;
             this.dispatchEvent(
                 new CustomEvent("updateTimeline", {
                     detail: {

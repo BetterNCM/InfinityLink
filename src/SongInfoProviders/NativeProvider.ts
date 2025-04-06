@@ -48,8 +48,25 @@ export class NativeProvider extends BaseProvider {
             );
         });
 
-        legacyNativeCmder.appendRegisterCall('Load', 'audioplayer', () => {
+        let currentSongLength = 0;
+
+        legacyNativeCmder.appendRegisterCall('Load', 'audioplayer', (_, info) => {
             checkPlayingSong();
+            currentSongLength = info.duration;
+        });
+
+        legacyNativeCmder.appendRegisterCall('PlayProgress', 'audioplayer', (_, progress) => {
+            if (progress === 0 && currentSongLength === 0)
+                return;
+            console.debug(`[InfLink] [Native]: ${progress} / ${currentSongLength}`);
+            this.dispatchEvent(
+                new CustomEvent("updateTimeline", {
+                    detail: {
+                        currentTime: progress * 1000,
+                        totalTime: currentSongLength * 1000,
+                    },
+                }),
+            );
         });
 
         const hookedNativeCallFunction = createHookFn(channel.call, [
