@@ -129,7 +129,8 @@ export class DOMProvider extends BaseProvider {
 
                 const mainPlayerTimeNowEl =
                     currentPlayerElem.querySelector<HTMLTimeElement>("time.now")!;
-                const timeAllEl = document.querySelector<HTMLTimeElement>("time.all")!;
+                const timeAllEl =
+                    currentPlayerElem.querySelector<HTMLTimeElement>("time.all")!;
                 currentTime = mainPlayerTimeNowEl.innerText;
                 totalTime = timeAllEl.innerText;
             }
