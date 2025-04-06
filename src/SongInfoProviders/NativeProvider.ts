@@ -1,5 +1,5 @@
 import { getPlayingSong } from "../hooks";
-import { createHookFn } from "../utils";
+import { createHookFn, throttle } from "../utils";
 import { BaseProvider, PlayState } from "./BaseProvider";
 
 export class NativeProvider extends BaseProvider {
@@ -55,19 +55,22 @@ export class NativeProvider extends BaseProvider {
             currentSongLength = info.duration;
         });
 
-        legacyNativeCmder.appendRegisterCall('PlayProgress', 'audioplayer', (_, progress) => {
-            if (progress === 0 && currentSongLength === 0)
-                return;
-            console.debug(`[InfLink] [Native]: ${progress} / ${currentSongLength}`);
-            this.dispatchEvent(
-                new CustomEvent("updateTimeline", {
-                    detail: {
-                        currentTime: progress * 1000,
-                        totalTime: currentSongLength * 1000,
-                    },
-                }),
-            );
-        });
+        legacyNativeCmder.appendRegisterCall(
+            "PlayProgress",
+            "audioplayer",
+            throttle((_, progress) => {
+                if (progress === 0 && currentSongLength === 0) return;
+                console.debug(`[InfLink] [Native]: ${progress} / ${currentSongLength}`);
+                this.dispatchEvent(
+                    new CustomEvent("updateTimeline", {
+                        detail: {
+                            currentTime: progress * 1000,
+                            totalTime: currentSongLength * 1000,
+                        },
+                    }),
+                );
+            }, 1000)[0],
+        );
 
         const hookedNativeCallFunction = createHookFn(channel.call, [
             (name: string, callback: Function, args: any[]) => {
